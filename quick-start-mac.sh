@@ -58,15 +58,28 @@ fi
 echo "⚙️ Creating .env file..."
 # Check if .env exists
 if [ -f ".env" ]; then
-    echo "✅ .env file already exists"
-else
-    cat > .env << EOL
+    echo "🔄 Updating .env file..."
+    # Backup existing .env
+    cp .env .env.backup
+fi
+
+# Always create/update .env to ensure correct values
+cat > .env << EOL
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=$(whoami)
 DB_PASSWORD=
 DB_NAME=kids_shop
 EOL
+echo "✅ .env file updated"
+
+# Verify database connection
+echo "🔍 Verifying database connection..."
+if psql -d kids_shop -c "SELECT 1" > /dev/null 2>&1; then
+    echo "✅ Database connection successful"
+else
+    echo "❌ Database connection failed"
+    exit 1
 fi
 
 echo "✨ Setup complete!"
@@ -75,6 +88,8 @@ echo "🌍 Server will be available at http://localhost:8080"
 
 # Start the server
 echo "🔄 Starting server..."
+# Export environment variables to ensure they're available
+export $(cat .env | xargs)
 go run .
 
 echo "✅ Server started successfully"
