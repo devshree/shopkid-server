@@ -72,3 +72,11 @@ fi
 echo "✨ Setup complete!"
 echo "🚀 To start the server, run: go run ."
 echo "🌍 Server will be available at http://localhost:8080" 
+
+# Start the server
+echo "🔄 Starting server..."
+go run .
+
+echo "✅ Server started successfully"
+
+
