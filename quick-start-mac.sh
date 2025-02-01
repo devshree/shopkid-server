@@ -73,9 +73,14 @@ DB_NAME=kids_shop
 EOL
 echo "✅ .env file updated"
 
+# Source the environment variables
+set -a # automatically export all variables
+source .env
+set +a
+
 # Verify database connection
 echo "🔍 Verifying database connection..."
-if psql -d kids_shop -c "SELECT 1" > /dev/null 2>&1; then
+if PGDATABASE=$DB_NAME PGUSER=$DB_USER psql -c "SELECT 1" > /dev/null 2>&1; then
     echo "✅ Database connection successful"
 else
     echo "❌ Database connection failed"
@@ -88,8 +93,6 @@ echo "🌍 Server will be available at http://localhost:8080"
 
 # Start the server
 echo "🔄 Starting server..."
-# Export environment variables to ensure they're available
-export $(cat .env | xargs)
 go run .
 
 echo "✅ Server started successfully"
