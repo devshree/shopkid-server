@@ -80,11 +80,19 @@ source ~/.zshrc
 
 3. Then install PostgreSQL and Go:
 ```bash
-brew install postgresql go
+brew install postgresql@14
 
 # Start PostgreSQL service
-brew services start postgresql
+brew services start postgresql@14
+
+# If PostgreSQL is already running, restart it
+brew services restart postgresql@14
+
+# Check PostgreSQL service status
+brew services list | grep postgresql
 ```
+
+Note: The `@14` specifies PostgreSQL version 14. Adjust this number if you installed a different version.
 
 ### Windows
 1. Download and install Go from [golang.org](https://golang.org/dl/)
@@ -136,6 +144,10 @@ DB_NAME=kids_shop
 After installing PostgreSQL, you need to create a database user. On macOS:
 
 ```bash
+# Check PostgreSQL installation
+which psql
+psql --version
+
 # Create a PostgreSQL user with your system username
 createuser -s $(whoami)
 
@@ -144,6 +156,9 @@ createdb kids_shop
 
 # Import the schema
 psql kids_shop < schema.sql
+
+# Verify database creation
+psql -l | grep kids_shop
 ```
 
 Note: For local development on macOS, you typically don't need a password for PostgreSQL when using your system username.
