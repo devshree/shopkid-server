@@ -23,6 +23,12 @@ A RESTful API for a children's clothing and toy shop built with Go and PostgreSQ
 ```bash
 sudo apt-get update
 sudo apt-get install postgresql postgresql-contrib golang-go
+
+# Start PostgreSQL service
+sudo service postgresql start
+
+# Enable PostgreSQL to start on boot
+sudo systemctl enable postgresql
 ```
 
 ### macOS
@@ -40,11 +46,19 @@ source ~/.zshrc
 3. Then install PostgreSQL and Go:
 ```bash
 brew install postgresql go
+
+# Start PostgreSQL service
+brew services start postgresql
 ```
 
 ### Windows
 1. Download and install Go from [golang.org](https://golang.org/dl/)
 2. Download and install PostgreSQL from [postgresql.org](https://www.postgresql.org/download/windows/)
+3. PostgreSQL service should start automatically. If not:
+   - Open Services (Win + R, type 'services.msc')
+   - Find 'PostgreSQL' service
+   - Right-click and select 'Start'
+   - Right-click again, select 'Properties', and set 'Startup type' to 'Automatic'
 
 ## Setup
 
