@@ -177,3 +177,22 @@ kids_shop/
 ├── schema.sql
 └── go.mod
 
+
+## Quick Start Script for macOS
+
+To quickly set up the project on macOS, run the following script:
+
+```bash
+./quick-start-mac.sh
+```
+
+The script will:
+- Install Homebrew if not present
+- Install and start PostgreSQL
+- Set up the database and user
+- Import the schema
+- Initialize Go module and install dependencies
+- Create the .env file with your system username
+
+After running the script, you can start the server with `go run .`
+

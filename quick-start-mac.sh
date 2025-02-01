@@ -33,23 +33,42 @@ createdb kids_shop || echo "✅ Database already exists"
 
 # Import schema
 echo "📝 Importing database schema..."
-psql kids_shop < schema.sql
+# Check if tables exist
+if psql -d kids_shop -c "\dt" | grep -q 'products\|cart_items'; then
+    echo "✅ Database tables already exist"
+else
+    psql kids_shop < schema.sql
+    echo "✅ Schema imported successfully"
+fi
 
 # Install Go dependencies
 echo "📦 Installing Go dependencies..."
-go mod init kids_shop
-go get github.com/gorilla/mux
-go get github.com/lib/pq
-go get github.com/joho/godotenv
+# Check if go.mod exists
+if [ -f "go.mod" ]; then
+    echo "✅ Go module already initialized"
+    go get -u ./...  # Update existing dependencies
+else
+    go mod init kids_shop
+    go get github.com/gorilla/mux
+    go get github.com/lib/pq
+    go get github.com/joho/godotenv
+fi
 
 # Create .env file
 echo "⚙️ Creating .env file..."
-cat > .env << EOL
+# Check if .env exists
+if [ -f ".env" ]; then
+    echo "✅ .env file already exists"
+else
+    cat > .env << EOL
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=$(whoami)
 DB_PASSWORD=
 DB_NAME=kids_shop
 EOL
+fi
 
-echo "✨ Setup complete! Run 'go run .' to start the server" 
+echo "✨ Setup complete!"
+echo "🚀 To start the server, run: go run ."
+echo "🌍 Server will be available at http://localhost:8080" 
