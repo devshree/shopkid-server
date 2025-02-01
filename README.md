@@ -17,28 +17,59 @@ A RESTful API for a children's clothing and toy shop built with Go and PostgreSQ
 - `POST /api/cart/add` - Add item to cart
 - `DELETE /api/cart/remove/{id}` - Remove item from cart
 
+## Prerequisites
+
+### Ubuntu/Debian
+```bash
+sudo apt-get update
+sudo apt-get install postgresql postgresql-contrib golang-go
+```
+
+### macOS
+1. Install Homebrew first:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+2. After installing Homebrew, you might need to add it to your PATH. Run these commands:
+```bash
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+3. Then install PostgreSQL and Go:
+```bash
+brew install postgresql go
+```
+
+### Windows
+1. Download and install Go from [golang.org](https://golang.org/dl/)
+2. Download and install PostgreSQL from [postgresql.org](https://www.postgresql.org/download/windows/)
+
 ## Setup
 
 1. Install dependencies:
-```
-bash
+```bash
 go mod init kids_shop
 go get github.com/gorilla/mux
 go get github.com/lib/pq
 go get github.com/joho/godotenv
 ```
+
 2. Set up PostgreSQL database:
-bash
+```bash
 createdb kids_shop
 psql kids_shop < schema.sql
+```
 
 3. Configure environment variables:
    - Copy `.env.example` to `.env`
    - Update the values in `.env` with your database credentials
 
 4. Run the server:
-bash
+```bash
 go run .
+```
 
 ## Environment Variables
 
@@ -51,7 +82,17 @@ DB_PASSWORD=your_password
 DB_NAME=kids_shop
 ```
 
-## License
+The project structure should look like this:
 
-MIT
+kids_shop/
+├── .env
+├── .env.example
+├── .gitignore
+├── README.md
+├── main.go
+├── db.go
+├── handlers.go
+├── models.go
+├── schema.sql
+└── go.mod
 
