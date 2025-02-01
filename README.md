@@ -91,10 +91,27 @@ Create a `.env` file with the following variables:
 ```
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=your_password
+DB_USER=your_system_username    # On macOS, this is your system username
+DB_PASSWORD=                    # Leave empty for local development
 DB_NAME=kids_shop
 ```
+
+### PostgreSQL Setup
+
+After installing PostgreSQL, you need to create a database user. On macOS:
+
+```bash
+# Create a PostgreSQL user with your system username
+createuser -s $(whoami)
+
+# Create the database
+createdb kids_shop
+
+# Import the schema
+psql kids_shop < schema.sql
+```
+
+Note: For local development on macOS, you typically don't need a password for PostgreSQL when using your system username.
 
 The project structure should look like this:
 
