@@ -19,10 +19,45 @@ A RESTful API for a children's clothing and toy shop built with Go and PostgreSQ
 
 ## Prerequisites
 
+### Install Go using GVM
+```bash
+# Install GVM prerequisites
+sudo apt-get install curl git mercurial make binutils bison gcc build-essential
+
+# Install GVM
+bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+
+# Source GVM
+source ~/.gvm/scripts/gvm
+
+# Install Go 1.4 (needed to build newer versions)
+gvm install go1.4 -B
+gvm use go1.4
+
+# Install latest stable version
+gvm install go1.21.6
+gvm use go1.21.6 --default
+
+# Verify installation
+go version
+```
+
+Add Go to your PATH by adding these lines to your ~/.zshrc or ~/.bashrc:
+```bash
+export GOROOT=$HOME/.gvm/gos/go1.21.6
+export GOPATH=$HOME/go
+export PATH=$GOROOT/bin:$GOPATH/bin:$PATH
+```
+
+Then source your shell configuration:
+```bash
+source ~/.zshrc  # or source ~/.bashrc
+```
+
 ### Ubuntu/Debian
 ```bash
 sudo apt-get update
-sudo apt-get install postgresql postgresql-contrib golang-go
+sudo apt-get install postgresql postgresql-contrib
 
 # Start PostgreSQL service
 sudo service postgresql start
