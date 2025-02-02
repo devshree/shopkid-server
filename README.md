@@ -10,6 +10,15 @@ A RESTful API for a children's clothing and toy shop built with Go and PostgreSQ
 
 ## API Endpoints
 
+Detailed API documentation is available in OpenAPI/Swagger format. You can view it by:
+
+1. Copy the contents of `swagger.yaml` to [Swagger Editor](https://editor.swagger.io/)
+2. Or use a local Swagger UI server:
+```bash
+docker run -p 8081:8080 -e SWAGGER_JSON=/swagger.yaml -v $(pwd):/swagger swaggerapi/swagger-ui
+```
+Then visit http://localhost:8081
+
 - `GET /api/products` - List all products
 - `GET /api/products/{id}` - Get a specific product
 - `POST /api/products` - Create a new product

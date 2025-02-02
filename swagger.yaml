@@ -1,0 +1,211 @@
+openapi: 3.0.0
+info:
+  title: Kids Shop API
+  description: API for a children's clothing and toy shop
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /api/products:
+    get:
+      summary: List all products
+      description: Returns a list of all available products
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          description: Internal server error
+    
+    post:
+      summary: Create a new product
+      description: Add a new product to the store
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid input
+        '500':
+          description: Internal server error
+
+  /api/products/{id}:
+    get:
+      summary: Get a specific product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Product ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+        '500':
+          description: Internal server error
+
+  /api/cart:
+    get:
+      summary: View cart contents
+      description: Returns all items in the shopping cart
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CartItem'
+        '500':
+          description: Internal server error
+
+  /api/cart/add:
+    post:
+      summary: Add item to cart
+      description: Add a product to the shopping cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemInput'
+      responses:
+        '200':
+          description: Item added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+        '400':
+          description: Invalid input
+        '500':
+          description: Internal server error
+
+  /api/cart/remove/{id}:
+    delete:
+      summary: Remove item from cart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Cart item ID
+      responses:
+        '200':
+          description: Item removed successfully
+        '404':
+          description: Item not found
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Kids T-Shirt"
+        description:
+          type: string
+          example: "Comfortable cotton t-shirt"
+        price:
+          type: number
+          format: float
+          example: 19.99
+        category:
+          type: string
+          enum: [clothes, toys]
+          example: "clothes"
+        age_range:
+          type: string
+          example: "3-5 years"
+        stock:
+          type: integer
+          example: 100
+
+    ProductInput:
+      type: object
+      required:
+        - name
+        - price
+        - category
+        - age_range
+        - stock
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        category:
+          type: string
+          enum: [clothes, toys]
+        age_range:
+          type: string
+        stock:
+          type: integer
+
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        product_id:
+          type: integer
+          example: 1
+        quantity:
+          type: integer
+          example: 2
+        price:
+          type: number
+          format: float
+          example: 39.98
+
+    CartItemInput:
+      type: object
+      required:
+        - product_id
+        - quantity
+        - price
+      properties:
+        product_id:
+          type: integer
+        quantity:
+          type: integer
+          minimum: 1
+        price:
+          type: number
+          format: float 
