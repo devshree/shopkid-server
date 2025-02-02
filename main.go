@@ -3,15 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
-	"strings"
 
 	"kids-shop/middleware"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
-	"github.com/rs/cors"
 )
 
 func main() {
@@ -26,15 +23,9 @@ func main() {
 
 	// Apply middlewares
 	r.Use(middleware.RequestLogger)
-
-	c := cors.New(cors.Options{
-		AllowedOrigins:   strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ","),
-		AllowedMethods:   strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ","),
-		AllowedHeaders:   strings.Split(os.Getenv("CORS_ALLOWED_HEADERS"), ","),
-		AllowCredentials: strings.ToLower(os.Getenv("CORS_ALLOW_CREDENTIALS")) == "true",
-		Logger: log.New(os.Stdout, "CORS: ", log.LstdFlags),
-	})
-	handler := c.Handler(r)
+	
+	// Apply CORS middleware
+	handler := middleware.NewCORS()(r)
 
 	db := initDB()
 	log.Printf("Database connected")
