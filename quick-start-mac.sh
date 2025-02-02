@@ -27,6 +27,18 @@ fi
 # Drop database if cleanAllDB is true
 if [ "$CLEAN_DB" = true ]; then
     echo "🗑️  Cleaning database..."
+    
+    # Terminate all connections to the database
+    echo "Terminating active connections..."
+    psql postgres -c "
+        SELECT pg_terminate_backend(pg_stat_activity.pid)
+        FROM pg_stat_activity
+        WHERE pg_stat_activity.datname = 'kids_shop'
+        AND pid <> pg_backend_pid();" || true
+    
+    # Wait a moment for connections to close
+    sleep 2
+
     dropdb --if-exists kids_shop
     dropuser --if-exists kidshop
     echo "✅ Database cleaned"
