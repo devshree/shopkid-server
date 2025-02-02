@@ -11,63 +11,8 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
-
-// CORS middleware
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get CORS settings from environment variables
-		allowedOrigins := strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
-		allowedMethods := os.Getenv("CORS_ALLOWED_METHODS")
-		allowedHeaders := os.Getenv("CORS_ALLOWED_HEADERS")
-		allowCredentials := os.Getenv("CORS_ALLOW_CREDENTIALS")
-		maxAge := os.Getenv("CORS_MAX_AGE")
-
-		// Handle multiple origins
-		origin := r.Header.Get("Origin")
-		log.Printf("Origin: %s", origin)
-		if origin != "" {
-			allowed := false
-			for _, allowedOrigin := range allowedOrigins {
-				if strings.TrimSpace(allowedOrigin) == origin {
-					allowed = true
-					w.Header().Set("Access-Control-Allow-Origin", origin)
-					break
-				}
-			}
-			// If no specific origin matches and "*" is in the allowed origins, allow all
-			if !allowed {
-				for _, allowedOrigin := range allowedOrigins {
-					if strings.TrimSpace(allowedOrigin) == "*" {
-						w.Header().Set("Access-Control-Allow-Origin", "*")
-						break
-					}
-				}
-			}
-		}
-
-		// Set other CORS headers
-		if allowedMethods != "" {
-			w.Header().Set("Access-Control-Allow-Methods", allowedMethods)
-		}
-		if allowedHeaders != "" {
-			w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
-		}
-		if strings.ToLower(allowCredentials) == "true" {
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-		}
-		if maxAge != "" {
-			w.Header().Set("Access-Control-Max-Age", maxAge)
-		}
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
 
 // requestLoggerMiddleware logs detailed request and response information
 func requestLoggerMiddleware(next http.Handler) http.Handler {
@@ -138,8 +83,17 @@ func main() {
 	log.Printf("Router initialized")
 
 	// Apply middlewares
-	r.Use(corsMiddleware)
-	r.Use(requestLoggerMiddleware)
+		r.Use(requestLoggerMiddleware)
+
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ","),
+		AllowedMethods:   strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ","),
+		AllowedHeaders:   strings.Split(os.Getenv("CORS_ALLOWED_HEADERS"), ","),
+		AllowCredentials: strings.ToLower(os.Getenv("CORS_ALLOW_CREDENTIALS")) == "true",
+		Logger: log.New(os.Stdout, "CORS: ", log.LstdFlags),
+	})
+	handler := c.Handler(r)
 
 	// Initialize database
 	db := initDB()
@@ -158,7 +112,7 @@ func main() {
 
 	// Start server
 	log.Printf("Server starting on :8080")
-	log.Fatal(http.ListenAndServe(":8080", handlers.LoggingHandler(log.Writer(), r)))
+	log.Fatal(http.ListenAndServe(":8080", handlers.LoggingHandler(log.Writer(), handler)))
 	log.Printf("Server started")
 	defer db.Close()
 } 
