@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -21,6 +22,7 @@ func (h *Handler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	var products []Product
 	rows, err := h.db.Query("SELECT id, name, description, price, category, age_range, stock FROM products")
 	if err != nil {
+		log.Println("Error querying products:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -30,6 +32,7 @@ func (h *Handler) GetProducts(w http.ResponseWriter, r *http.Request) {
 		var p Product
 		err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Category, &p.Age_Range, &p.Stock)
 		if err != nil {
+			log.Println("Error scanning product:", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -43,6 +46,7 @@ func (h *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
+		log.Println("Error converting product ID:", err)
 		http.Error(w, "Invalid product ID", http.StatusBadRequest)
 		return
 	}
@@ -51,6 +55,7 @@ func (h *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	err = h.db.QueryRow("SELECT id, name, description, price, category, age_range, stock FROM products WHERE id = $1", id).
 		Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Category, &p.Age_Range, &p.Stock)
 	if err != nil {
+		log.Println("Error querying product:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -61,6 +66,7 @@ func (h *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var p Product
 	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
+		log.Println("Error decoding product:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -69,6 +75,7 @@ func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		"INSERT INTO products (name, description, price, category, age_range, stock) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 		p.Name, p.Description, p.Price, p.Category, p.Age_Range, p.Stock).Scan(&p.ID)
 	if err != nil {
+		log.Println("Error creating product:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -80,6 +87,7 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 	var items []CartItem
 	rows, err := h.db.Query("SELECT id, product_id, quantity, price FROM cart_items")
 	if err != nil {
+		log.Println("Error querying cart items:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -89,6 +97,7 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 		var item CartItem
 		err := rows.Scan(&item.ID, &item.ProductID, &item.Quantity, &item.Price)
 		if err != nil {
+			log.Println("Error scanning cart item:", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -101,6 +110,7 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 	var item CartItem
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
+		log.Println("Error decoding cart item:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -109,6 +119,7 @@ func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 		"INSERT INTO cart_items (product_id, quantity, price) VALUES ($1, $2, $3) RETURNING id",
 		item.ProductID, item.Quantity, item.Price).Scan(&item.ID)
 	if err != nil {
+		log.Println("Error adding to cart:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -120,15 +131,17 @@ func (h *Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
+		log.Println("Error converting cart item ID:", err)
 		http.Error(w, "Invalid cart item ID", http.StatusBadRequest)
 		return
 	}
 
 	_, err = h.db.Exec("DELETE FROM cart_items WHERE id = $1", id)
 	if err != nil {
+		log.Println("Error deleting cart item:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}
+		}
 
 	w.WriteHeader(http.StatusOK)
 } 

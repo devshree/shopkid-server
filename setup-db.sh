@@ -11,7 +11,7 @@ echo "Creating database user 'kidshop'..."
 createuser -s kidshop || echo "✅ User already exists"
 
 echo "Creating database 'kids_shop'..."
-psql -U kidshop postgres -c 'CREATE DATABASE kidshop;' || echo "✅ Database already exists"
+psql -U kidshop postgres -c 'CREATE DATABASE kids_shop;' || echo "✅ Database already exists"
 
 # Grant privileges
 echo "Granting privileges..."
