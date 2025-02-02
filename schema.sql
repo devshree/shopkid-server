@@ -73,3 +73,18 @@ CREATE TRIGGER update_orders_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+-- Create trigger function for deleting related cart items
+CREATE OR REPLACE FUNCTION delete_related_cart_items()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM cart_items WHERE product_id = OLD.id;
+    RETURN OLD;
+END;
+$$ language 'plpgsql';
+
+-- Add trigger to products table
+CREATE TRIGGER delete_product_cart_items
+    BEFORE DELETE ON products
+    FOR EACH ROW
+    EXECUTE FUNCTION delete_related_cart_items();
+

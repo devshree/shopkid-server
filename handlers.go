@@ -181,6 +181,7 @@ func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	result, err := h.db.Exec("DELETE FROM products WHERE id = $1", id)
 	if err != nil {
+		log.Println("Error deleting product:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
