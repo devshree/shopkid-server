@@ -82,17 +82,7 @@ if [ -f ".env" ]; then
     # Backup existing .env
     cp .env .env.backup
 fi
-
-# Always create/update .env to ensure correct values
-cat > .env << EOL
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=kidshop
-DB_PASSWORD=kidshop
-DB_NAME=kids_shop
-EOL
-echo "✅ .env file updated"
-
+ 
 # Source the environment variables
 set -a # automatically export all variables
 source .env

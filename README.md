@@ -143,32 +143,12 @@ psql kids_shop < schema.sql
 
 3. Configure environment variables:
    - Copy `.env.example` to `.env`
+   ``` cp .env.example .env ```
    - Update the values in `.env` with your database credentials
 
 4. Run the server:
 ```bash
 go run .
-```
-
-## Environment Variables
-
-Create a `.env` file with the following variables:
-```
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=kidshop
-DB_PASSWORD=
-DB_NAME=kids_shop
-
-# Logging Configuration
-ENABLE_REQUEST_LOGGING=ON
-
-# CORS Configuration
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,http://yourdomain.com
-CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,OPTIONS
-CORS_ALLOWED_HEADERS=Content-Type,Authorization
-CORS_ALLOW_CREDENTIALS=true
-CORS_MAX_AGE=86400
 ```
 
 ### PostgreSQL Setup
