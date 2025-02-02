@@ -24,15 +24,18 @@ func initDB() *sql.DB {
 		os.Getenv("DB_NAME"),
 	)
 
+	log.Printf("DB URL: %s", dbURL)
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 
+	log.Printf("DB connected")
 	err = db.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	log.Printf("DB pinged")
 	return db
 } 

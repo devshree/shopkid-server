@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/handlers"
@@ -60,4 +59,5 @@ func main() {
 	// Start server
 	log.Printf("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", handlers.LoggingHandler(log.Writer(), r)))
+	log.Printf("Server started")
 } 
