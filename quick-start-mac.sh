@@ -137,6 +137,16 @@ echo "✨ Setup complete!"
 echo "🚀 To start the server, run: go run ."
 echo "🌍 Server will be available at http://localhost:8080" 
 
+# Install required Go tools
+echo "Installing Go tools..."
+go install golang.org/x/tools/gopls@latest
+go install golang.org/x/tools/cmd/goimports@latest
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+# Download dependencies
+echo "Downloading dependencies..."
+go mod tidy
+
 # Start the server
 echo "🔄 Starting server..."
 go run .

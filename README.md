@@ -56,6 +56,10 @@ gvm use go1.4
 gvm install go1.21.6
 gvm use go1.21.6 --default
 
+go install golang.org/x/tools/gopls@latest
+go install golang.org/x/tools/cmd/goimports@latest
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
 # Verify installation
 go version
 ```

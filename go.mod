@@ -1,6 +1,6 @@
-module kids_shop
+module kids-shop
 
-go 1.23.5
+go 1.21
 
 require (
 	github.com/gorilla/handlers v1.5.2
