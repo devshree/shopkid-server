@@ -30,7 +30,6 @@
     "editor.snippetSuggestions": "none"
   },
   "gopls": {
-    "usePlaceholders": true,
     "completionDocumentation": true,
     "completionBudget": "500ms",
     "ui.completion.usePlaceholders": true,
@@ -43,5 +42,24 @@
   },
   "go.toolsManagement.autoUpdate": true,
   "go.vetOnSave": "workspace",
-  "go.toolsManagement.checkForUpdates": "local"
+  "go.toolsManagement.checkForUpdates": "local",
+
+  "terminal.integrated.env.osx": {
+    "PATH": "/Users/devshree/.gvm/gos/go1.21.6/bin:/Users/devshree/go/bin:${env:PATH}",
+    "GOROOT": "/Users/devshree/.gvm/gos/go1.21.6",
+    "GOPATH": "/Users/devshree/go"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": true,
+  "editor.accessibilitySupport": "off",
+  "terminal.integrated.shell.osx": "/bin/zsh",
+  "terminal.integrated.automationProfile.osx": {
+    "path": "/bin/zsh"
+  },
+  "explorer.confirmDelete": false,
+  "terminal.integrated.enableMultiLinePasteWarning": "auto",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "editor.wrappingStrategy": "advanced",
+  "go.alternateTools": {},
+  "go.goroot": "~/.gvm/gos/go1.21.6"
 }

@@ -17,7 +17,6 @@ go.work
 .idea/
 *.swp
 *.swo
-.vscode/settings.json
 
 
 # OS specific
