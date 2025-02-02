@@ -1,0 +1,22 @@
+{
+  "editor.fontVariations": false,
+  "files.autoSave": "onFocusChange",
+  "files.autoSaveDelay": 1000,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "true",
+    "source.organizeImports": "true",
+    "source.fixAll.stylelint": "true"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.formatOnSaveMode": "modifications",
+  "editor.formatOnSaveOptions": {
+    "tabSize": 2,
+    "insertSpaces": true,
+    "trimTrailingWhitespace": true,
+    "trimFinalNewlines": true,
+    "prettier.disableLanguages": ["html"]
+  }
+}
