@@ -183,7 +183,11 @@ kids_shop/
 To quickly set up the project on macOS, run the following script:
 
 ```bash
+# For normal setup
 ./quick-start-mac.sh
+
+# To clean and recreate database
+./quick-start-mac.sh cleanAllDB
 ```
 
 The script will:
@@ -192,7 +196,14 @@ The script will:
 - Set up the database and user
 - Import the schema
 - Initialize Go module and install dependencies
-- Create the .env file with your system username
+- Create the .env file with default database credentials
+
+### Script Options
+
+- `cleanAllDB`: Drops and recreates the database and user
+  - Removes existing database and user
+  - Creates fresh database with schema
+  - Useful for resetting to a clean state
 
 After running the script, you can start the server with `go run .`
 

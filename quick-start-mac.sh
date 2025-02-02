@@ -3,6 +3,15 @@
 # Exit on any error
 set -e
 
+# Check for cleanAllDB parameter
+CLEAN_DB=false
+for arg in "$@"
+do
+    if [ "$arg" == "cleanAllDB" ]; then
+        CLEAN_DB=true
+    fi
+done
+
 echo "🚀 Starting Kids Shop API setup..."
 
 # Check if Homebrew is installed
@@ -13,6 +22,14 @@ if ! command -v brew &> /dev/null; then
     source ~/.zshrc
 else
     echo "✅ Homebrew already installed"
+fi
+
+# Drop database if cleanAllDB is true
+if [ "$CLEAN_DB" = true ]; then
+    echo "🗑️  Cleaning database..."
+    dropdb --if-exists kids_shop
+    dropuser --if-exists kidshop
+    echo "✅ Database cleaned"
 fi
 
 # Install PostgreSQL
@@ -33,8 +50,8 @@ createdb kids_shop || echo "✅ Database already exists"
 
 # Import schema
 echo "📝 Importing database schema..."
-# Check if tables exist
-if psql -d kids_shop -c "\dt" | grep -q 'products\|cart_items'; then
+# Check if tables exist and cleanAllDB is not true
+if [ "$CLEAN_DB" = false ] && psql -d kids_shop -c "\dt" | grep -q 'products\|cart_items'; then
     echo "✅ Database tables already exist"
 else
     psql kids_shop < schema.sql
