@@ -7,6 +7,7 @@ A RESTful API for a children's clothing and toy shop built with Go and PostgreSQ
 - Product management (list, get, create)
 - Shopping cart functionality (view, add, remove items)
 - PostgreSQL database integration
+- CORS support for frontend integration
 
 ## API Endpoints
 
@@ -19,6 +20,7 @@ docker run -p 8081:8080 -e SWAGGER_JSON=/swagger.yaml -v $(pwd):/swagger swagger
 ```
 Then visit http://localhost:8081
 
+### Available Endpoints
 - `GET /api/products` - List all products
 - `GET /api/products/{id}` - Get a specific product
 - `POST /api/products` - Create a new product
@@ -153,6 +155,16 @@ DB_PORT=5432
 DB_USER=kidshop
 DB_PASSWORD=
 DB_NAME=kids_shop
+
+# Logging Configuration
+ENABLE_REQUEST_LOGGING=ON
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,http://yourdomain.com
+CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,OPTIONS
+CORS_ALLOWED_HEADERS=Content-Type,Authorization
+CORS_ALLOW_CREDENTIALS=true
+CORS_MAX_AGE=86400
 ```
 
 ### PostgreSQL Setup
