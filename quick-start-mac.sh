@@ -55,34 +55,14 @@ brew services restart postgresql@14
 # Wait for PostgreSQL to start
 sleep 3
 
-# Create database user and database
-echo "🗄️ Setting up database..."
+# Create database user and database 
 
-# Ensure we're using postgres database for admin commands
-export PGDATABASE=postgres
+# Make the setup-db.sh script executable
+chmod +x setup-db.sh
 
-# Switch to postgres user to create new user and database
-echo "Creating database user 'kidshop'..."
-createuser -s kidshop || echo "✅ User already exists"
+# Run database setup
+./setup-db.sh
 
-echo "Creating database 'kids_shop'..."
-createdb kids_shop || echo "✅ Database already exists"
-
-# Grant privileges
-echo "Granting privileges..."
-psql postgres -c "ALTER DATABASE kids_shop OWNER TO kidshop"
-psql kids_shop -c "ALTER SCHEMA public OWNER TO kidshop"
-
-# Import schema
-echo "📝 Importing database schema..."
-# Check if tables exist and cleanAllDB is not true
-if [ "$CLEAN_DB" = false ] && PGDATABASE=kids_shop psql -c "\dt" | grep -q 'products\|cart_items'; then
-    echo "✅ Database tables already exist"
-else
-    echo "Importing schema as kidshop user..."
-    PGUSER=kidshop PGDATABASE=kids_shop psql < schema.sql
-    echo "✅ Schema imported successfully"
-fi
 
 # Install Go dependencies
 echo "📦 Installing Go dependencies..."
