@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gorilla/mux"
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -25,6 +25,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 
 		// Handle multiple origins
 		origin := r.Header.Get("Origin")
+		log.Printf("Origin: %s", origin)
 		if origin != "" {
 			allowed := false
 			for _, allowedOrigin := range allowedOrigins {
@@ -143,7 +144,6 @@ func main() {
 	// Initialize database
 	db := initDB()
 	log.Printf("Database connected")
-	defer db.Close()
 
 	// Initialize handlers
 	h := NewHandler(db)
@@ -160,4 +160,5 @@ func main() {
 	log.Printf("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", handlers.LoggingHandler(log.Writer(), r)))
 	log.Printf("Server started")
+	defer db.Close()
 } 

@@ -4,11 +4,11 @@
 set -e
 
 # Check for cleanAllDB parameter
-CLEAN_DB=false
+CLEAN_DB=""
 for arg in "$@"
 do
     if [ "$arg" == "cleanAllDB" ]; then
-        CLEAN_DB=true
+        CLEAN_DB=cleanAllDB
     fi
 done
 
@@ -24,25 +24,7 @@ else
     echo "✅ Homebrew already installed"
 fi
 
-# Drop database if cleanAllDB is true
-if [ "$CLEAN_DB" = true ]; then
-    echo "🗑️  Cleaning database..."
-    
-    # Terminate all connections to the database
-    echo "Terminating active connections..."
-    psql postgres -c "
-        SELECT pg_terminate_backend(pg_stat_activity.pid)
-        FROM pg_stat_activity
-        WHERE pg_stat_activity.datname = 'kids_shop'
-        AND pid <> pg_backend_pid();" || true
-    
-    # Wait a moment for connections to close
-    sleep 2
 
-    dropdb --if-exists kids_shop
-    dropuser --if-exists kidshop
-    echo "✅ Database cleaned"
-fi
 
 # Install PostgreSQL
 echo "📦 Installing PostgreSQL..."
@@ -61,7 +43,7 @@ sleep 3
 chmod +x setup-db.sh
 
 # Run database setup
-./setup-db.sh
+./setup-db.sh $CLEAN_DB
 
 
 # Install Go dependencies
@@ -92,7 +74,7 @@ cat > .env << EOL
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=kidshop
-DB_PASSWORD=
+DB_PASSWORD=kidshop
 DB_NAME=kids_shop
 EOL
 echo "✅ .env file updated"
