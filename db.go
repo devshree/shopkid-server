@@ -10,6 +10,12 @@ import (
 )
 
 func initDB() *sql.DB {
+	log.Printf("Connecting to database with settings:")
+	log.Printf("Host: %s", os.Getenv("DB_HOST"))
+	log.Printf("Port: %s", os.Getenv("DB_PORT"))
+	log.Printf("User: %s", os.Getenv("DB_USER"))
+	log.Printf("Database: %s", os.Getenv("DB_NAME"))
+
 	dbURL := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_PORT"),

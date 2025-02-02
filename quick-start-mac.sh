@@ -45,16 +45,30 @@ sleep 3
 
 # Create database user and database
 echo "🗄️ Setting up database..."
+
+# Ensure we're using postgres database for admin commands
+export PGDATABASE=postgres
+
+# Switch to postgres user to create new user and database
+echo "Creating database user 'kidshop'..."
 createuser -s kidshop || echo "✅ User already exists"
+
+echo "Creating database 'kids_shop'..."
 createdb kids_shop || echo "✅ Database already exists"
+
+# Grant privileges
+echo "Granting privileges..."
+psql postgres -c "ALTER DATABASE kids_shop OWNER TO kidshop"
+psql kids_shop -c "ALTER SCHEMA public OWNER TO kidshop"
 
 # Import schema
 echo "📝 Importing database schema..."
 # Check if tables exist and cleanAllDB is not true
-if [ "$CLEAN_DB" = false ] && psql -d kids_shop -c "\dt" | grep -q 'products\|cart_items'; then
+if [ "$CLEAN_DB" = false ] && PGDATABASE=kids_shop psql -c "\dt" | grep -q 'products\|cart_items'; then
     echo "✅ Database tables already exist"
 else
-    psql kids_shop < schema.sql
+    echo "Importing schema as kidshop user..."
+    PGUSER=kidshop PGDATABASE=kids_shop psql < schema.sql
     echo "✅ Schema imported successfully"
 fi
 
@@ -97,10 +111,12 @@ set +a
 
 # Verify database connection
 echo "🔍 Verifying database connection..."
-if PGDATABASE=$DB_NAME PGUSER=$DB_USER psql -c "SELECT 1" > /dev/null 2>&1; then
+if PGUSER=kidshop PGDATABASE=kids_shop psql -c "SELECT 1" > /dev/null 2>&1; then
     echo "✅ Database connection successful"
 else
     echo "❌ Database connection failed"
+    echo "Error: Unable to connect to database 'kids_shop' as user 'kidshop'"
+    echo "Try running with cleanAllDB: ./quick-start-mac.sh cleanAllDB"
     exit 1
 fi
 

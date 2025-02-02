@@ -19,6 +19,13 @@ A RESTful API for a children's clothing and toy shop built with Go and PostgreSQ
 
 ## Prerequisites
 
+### PostgreSQL Setup
+
+The application uses PostgreSQL with the following default configuration:
+- Database name: `kids_shop`
+- Database user: `kidshop`
+- No password (for local development)
+
 ### Install Go using GVM
 ```bash
 # Install GVM prerequisites
@@ -141,42 +148,31 @@ DB_NAME=kids_shop
 
 ### PostgreSQL Setup
 
-After installing PostgreSQL, you need to create a database user. On macOS:
+The quick start script will handle the database setup automatically, but if you need to do it manually:
 
 ```bash
 # Check PostgreSQL installation
 which psql
 psql --version
 
-# Create a PostgreSQL user with your system username
-createuser -s $(whoami)
+# Create the database user
+createuser -s kidshop
 
 # Create the database
 createdb kids_shop
 
+# Set ownership
+psql postgres -c "ALTER DATABASE kids_shop OWNER TO kidshop"
+psql kids_shop -c "ALTER SCHEMA public OWNER TO kidshop"
+
 # Import the schema
-psql kids_shop < schema.sql
+PGUSER=kidshop PGDATABASE=kids_shop psql < schema.sql
 
 # Verify database creation
 psql -l | grep kids_shop
 ```
 
-Note: For local development on macOS, you typically don't need a password for PostgreSQL when using your system username.
-
-The project structure should look like this:
-
-kids_shop/
-├── .env
-├── .env.example
-├── .gitignore
-├── README.md
-├── main.go
-├── db.go
-├── handlers.go
-├── models.go
-├── schema.sql
-└── go.mod
-
+Note: For local development, the application is configured to use PostgreSQL without a password.
 
 ## Quick Start Script for macOS
 
@@ -193,10 +189,11 @@ To quickly set up the project on macOS, run the following script:
 The script will:
 - Install Homebrew if not present
 - Install and start PostgreSQL
-- Set up the database and user
+- Set up the database (kids_shop) and user (kidshop)
 - Import the schema
 - Initialize Go module and install dependencies
 - Create the .env file with default database credentials
+- Start the server automatically
 
 ### Script Options
 
@@ -205,5 +202,13 @@ The script will:
   - Creates fresh database with schema
   - Useful for resetting to a clean state
 
-After running the script, you can start the server with `go run .`
+### Troubleshooting
+
+If you encounter database connection issues:
+1. Check if PostgreSQL is running: `brew services list | grep postgresql`
+2. Try cleaning and recreating the database: `./quick-start-mac.sh cleanAllDB`
+3. Verify database exists: `psql -l | grep kids_shop`
+4. Check user permissions: `psql -U kidshop -d kids_shop -c "\du"`
+
+The server will start automatically after setup. Access the API at http://localhost:8080
 
