@@ -176,6 +176,7 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 	var p Product
 	if err = json.NewDecoder(r.Body).Decode(&p); err != nil {
+		log.Println("Error decoding product:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
