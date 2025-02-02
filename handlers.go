@@ -159,6 +159,7 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	log.Println("Updating product:", p)
 
 	_, err = h.db.Exec(
 		"UPDATE products SET name=$1, description=$2, price=$3, category=$4, age_range=$5, stock=$6, image=$7, updated_at=CURRENT_TIMESTAMP WHERE id=$8",

@@ -18,7 +18,7 @@ import (
 func requestLoggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Check if detailed logging is enabled
-		if strings.ToUpper(os.Getenv("ENABLE_REQUEST_LOGGING")) != "ON" {
+		if os.Getenv("ENABLE_REQUEST_LOGGING") != "true" {
 			next.ServeHTTP(w, r)
 			return
 		}
