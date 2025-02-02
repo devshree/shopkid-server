@@ -143,7 +143,9 @@ psql kids_shop < schema.sql
 
 3. Configure environment variables:
    - Copy `.env.example` to `.env`
-   ``` cp .env.example .env ```
+``` 
+cp .env.example .env 
+```
    - Update the values in `.env` with your database credentials
 
 4. Run the server:
