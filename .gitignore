@@ -15,12 +15,12 @@ go.work
 
 # IDE specific
 .idea/
-.vscode/
 *.swp
 *.swo
+.vscode/settings.json
+
 
 # OS specific
 .DS_Store
 Thumbs.db 
 .env.backup
-.vscode/settings.json
