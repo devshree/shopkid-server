@@ -20,7 +20,7 @@ func NewHandler(db *sql.DB) *Handler {
 
 func (h *Handler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	var products []Product
-	rows, err := h.db.Query("SELECT id, name, description, price, category, age_range, stock FROM products")
+	rows, err := h.db.Query("SELECT id, name, description, price, category, age_range, stock, image, created_at FROM products")
 	if err != nil {
 		log.Println("Error querying products:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -30,7 +30,7 @@ func (h *Handler) GetProducts(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var p Product
-		err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Category, &p.Age_Range, &p.Stock)
+		err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Category, &p.Age_Range, &p.Stock, &p.Image, &p.CreatedAt)
 		if err != nil {
 			log.Println("Error scanning product:", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -52,8 +52,8 @@ func (h *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var p Product
-	err = h.db.QueryRow("SELECT id, name, description, price, category, age_range, stock FROM products WHERE id = $1", id).
-		Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Category, &p.Age_Range, &p.Stock)
+	err = h.db.QueryRow("SELECT id, name, description, price, category, age_range, stock, image, created_at FROM products WHERE id = $1", id).
+		Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Category, &p.Age_Range, &p.Stock, &p.Image, &p.CreatedAt)
 	if err != nil {
 		log.Println("Error querying product:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -72,8 +72,8 @@ func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := h.db.QueryRow(
-		"INSERT INTO products (name, description, price, category, age_range, stock) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-		p.Name, p.Description, p.Price, p.Category, p.Age_Range, p.Stock).Scan(&p.ID)
+		"INSERT INTO products (name, description, price, category, age_range, stock, image) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+		p.Name, p.Description, p.Price, p.Category, p.Age_Range, p.Stock, p.Image).Scan(&p.ID)
 	if err != nil {
 		log.Println("Error creating product:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
