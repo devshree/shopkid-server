@@ -1,6 +1,7 @@
 package main
 
 import (
+	"kids-shop/middleware"
 	"log"
 	"net/http"
 
@@ -20,7 +21,11 @@ func main() {
 
 	h := NewHandler(db)
 	
-	r, handler := setupRouter(h)
+	r := setupRouter(h)
+
+	// Apply CORS middleware
+	handler := middleware.NewCORS()(r)
+
 	log.Printf("Router initialized")
 
 	log.Printf("Server starting on :8080")

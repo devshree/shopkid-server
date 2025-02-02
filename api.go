@@ -2,20 +2,16 @@ package main
 
 import (
 	"kids-shop/middleware"
-	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
-func setupRouter(h *Handler) (*mux.Router, http.Handler) {
+func setupRouter(h *Handler) (*mux.Router) {
 	r := mux.NewRouter()
 
 	// Apply middlewares
 	r.Use(middleware.RequestLogger)
 	
-	// Apply CORS middleware
-	handler := middleware.NewCORS()(r)
-
 	// Routes
 	r.HandleFunc("/api/products", h.GetProducts).Methods("GET", "OPTIONS")
 	r.HandleFunc("/api/products/{id}", h.GetProduct).Methods("GET", "OPTIONS")
@@ -27,5 +23,5 @@ func setupRouter(h *Handler) (*mux.Router, http.Handler) {
 	r.HandleFunc("/api/cart/add", h.AddToCart).Methods("POST", "OPTIONS")
 	r.HandleFunc("/api/cart/remove/{id}", h.RemoveFromCart).Methods("DELETE", "OPTIONS")
 
-	return r, handler
+	return r
 } 
