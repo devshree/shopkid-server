@@ -10,15 +10,19 @@ import (
 
 func main() {
 	// Load environment variables
+	log.Printf("Loading env variables") 
+
 	if err := godotenv.Load(); err != nil {
 		log.Printf("Warning: .env file not found")
 	}
 
 	// Initialize router
 	r := mux.NewRouter()
+	log.Printf("Router initialized")
 
 	// Initialize database
 	db := initDB()
+	log.Printf("Database connected")
 	defer db.Close()
 
 	// Initialize handlers

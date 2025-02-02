@@ -134,8 +134,8 @@ Create a `.env` file with the following variables:
 ```
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=your_system_username    # On macOS, this is your system username
-DB_PASSWORD=                    # Leave empty for local development
+DB_USER=kidshop
+DB_PASSWORD=
 DB_NAME=kids_shop
 ```
 

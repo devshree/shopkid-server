@@ -28,7 +28,7 @@ sleep 3
 
 # Create database user and database
 echo "🗄️ Setting up database..."
-createuser -s $(whoami) || echo "✅ User already exists"
+createuser -s kidshop || echo "✅ User already exists"
 createdb kids_shop || echo "✅ Database already exists"
 
 # Import schema
@@ -67,7 +67,7 @@ fi
 cat > .env << EOL
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=$(whoami)
+DB_USER=kidshop
 DB_PASSWORD=
 DB_NAME=kids_shop
 EOL
