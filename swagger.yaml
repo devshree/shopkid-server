@@ -67,6 +67,32 @@ paths:
           description: Product not found
         '500':
           description: Internal server error
+    
+    put:
+      summary: Update a product
+      description: Update an existing product's details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Product ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Product updated successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: Product not found
+        '500':
+          description: Internal server error
 
   /api/cart:
     get:
@@ -176,6 +202,8 @@ components:
           type: string
         stock:
           type: integer
+        image:
+          type: string
 
     CartItem:
       type: object

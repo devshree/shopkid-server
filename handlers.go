@@ -141,7 +141,32 @@ func (h *Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error deleting cart item:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "Invalid product ID", http.StatusBadRequest)
+		return
+	}
+
+	var p Product
+	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_, err = h.db.Exec(
+		"UPDATE products SET name=$1, description=$2, price=$3, category=$4, age_range=$5, stock=$6, image=$7, updated_at=CURRENT_TIMESTAMP WHERE id=$8",
+		p.Name, p.Description, p.Price, p.Category, p.Age_Range, p.Stock, p.Image, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 } 
