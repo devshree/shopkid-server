@@ -18,5 +18,30 @@
     "trimTrailingWhitespace": true,
     "trimFinalNewlines": true,
     "prettier.disableLanguages": ["html"]
-  }
+  },
+  "go.useLanguageServer": true,
+  "go.lintTool": "golangci-lint",
+  "go.formatTool": "goimports",
+  "[go]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.snippetSuggestions": "none"
+  },
+  "gopls": {
+    "usePlaceholders": true,
+    "completionDocumentation": true,
+    "completionBudget": "500ms",
+    "ui.completion.usePlaceholders": true,
+    "ui.diagnostic.analyses": {
+      "unusedparams": true,
+      "shadow": true
+    },
+    "ui.semanticTokens": true,
+    "formatting.gofumpt": true
+  },
+  "go.toolsManagement.autoUpdate": true,
+  "go.vetOnSave": "workspace",
+  "go.toolsManagement.checkForUpdates": "local"
 }
