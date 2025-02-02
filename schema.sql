@@ -17,6 +17,7 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) CHECK (role IN ('admin', 'buyer', 'purchaser')) NOT NULL DEFAULT 'buyer',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -26,13 +27,23 @@ CREATE TABLE cart_items (
     product_id INTEGER REFERENCES products(id),
     quantity INTEGER NOT NULL,
     price DECIMAL(10,2) NOT NULL,
+    user_id INTEGER REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
 
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    user_id INTEGER REFERENCES users(id) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    total_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE order_items (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
     product_id INTEGER REFERENCES products(id),
     quantity INTEGER NOT NULL,
     price DECIMAL(10,2) NOT NULL,
@@ -70,6 +81,12 @@ CREATE TRIGGER update_cart_items_updated_at
 -- Add trigger to orders table
 CREATE TRIGGER update_orders_updated_at
     BEFORE UPDATE ON orders
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Add trigger for order_items
+CREATE TRIGGER update_order_items_updated_at
+    BEFORE UPDATE ON order_items
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 

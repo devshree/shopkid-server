@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -16,7 +15,6 @@ func NewCORS() func(http.Handler) http.Handler {
 		AllowedMethods:   strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ","),
 		AllowedHeaders:   strings.Split(os.Getenv("CORS_ALLOWED_HEADERS"), ","),
 		AllowCredentials: strings.ToLower(os.Getenv("CORS_ALLOW_CREDENTIALS")) == "true",
-		Logger:           log.New(os.Stdout, "CORS: ", log.LstdFlags),
 	})
 	return c.Handler
 } 

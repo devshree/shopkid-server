@@ -14,9 +14,47 @@ type Product struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+type User struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Password  string    `json:"-"` // "-" means don't include in JSON
+	Role      string    `json:"role"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type CartItem struct {
-	ID        int     `json:"id"`
-	ProductID int     `json:"product_id"`
-	Quantity  int     `json:"quantity"`
-	Price     float64 `json:"price"`
+	ID        int       `json:"id"`
+	UserID    int       `json:"user_id"`
+	ProductID int       `json:"product_id"`
+	Product   *Product  `json:"product,omitempty"`
+	Quantity  int       `json:"quantity"`
+	Price     float64   `json:"price"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type Order struct {
+	ID          int          `json:"id"`
+	UserID      int          `json:"user_id"`
+	Status      string       `json:"status"`
+	TotalAmount float64      `json:"total_amount"`
+	Items       []OrderItem  `json:"items,omitempty"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+}
+
+type OrderItem struct {
+	ID        int       `json:"id"`
+	OrderID   int       `json:"order_id"`
+	ProductID int       `json:"product_id"`
+	Product   *Product  `json:"product,omitempty"`
+	Quantity  int       `json:"quantity"`
+	Price     float64   `json:"price"`
+	CreatedAt time.Time `json:"created_at"`
 } 	
