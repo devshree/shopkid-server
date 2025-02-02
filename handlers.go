@@ -39,7 +39,11 @@ func (h *Handler) GetProducts(w http.ResponseWriter, r *http.Request) {
 		products = append(products, p)
 	}
 
-	json.NewEncoder(w).Encode(products)
+	if err := json.NewEncoder(w).Encode(products); err != nil {
+		log.Println("Error encoding response:", err)
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +64,11 @@ func (h *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(p)
+	if err := json.NewEncoder(w).Encode(p); err != nil {
+		log.Println("Error encoding response:", err)
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +88,11 @@ func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(p)
+	if err := json.NewEncoder(w).Encode(p); err != nil {
+		log.Println("Error encoding response:", err)
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +116,11 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 		items = append(items, item)
 	}
 
-	json.NewEncoder(w).Encode(items)
+	if err := json.NewEncoder(w).Encode(items); err != nil {
+		log.Println("Error encoding response:", err)
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +140,11 @@ func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(item)
+	if err := json.NewEncoder(w).Encode(item); err != nil {
+		log.Println("Error encoding response:", err)
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
