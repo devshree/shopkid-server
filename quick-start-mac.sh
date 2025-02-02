@@ -3,12 +3,15 @@
 # Exit on any error
 set -e
 
-# Check for cleanAllDB parameter
+# Check for parameters
 CLEAN_DB=""
+WITH_SAMPLE_DATA=""
 for arg in "$@"
 do
     if [ "$arg" == "cleanAllDB" ]; then
         CLEAN_DB=cleanAllDB
+    elif [ "$arg" == "withSampleData" ]; then
+        WITH_SAMPLE_DATA=true
     fi
 done
 
@@ -45,6 +48,17 @@ chmod +x setup-db.sh
 # Run database setup
 ./setup-db.sh $CLEAN_DB
 
+# Insert sample data if requested
+if [ "$WITH_SAMPLE_DATA" = true ]; then
+    echo "📝 Inserting sample data..."
+    PGPASSWORD=kidshop psql -U kidshop -d kids_shop -f mockData.sql
+    if [ $? -eq 0 ]; then
+        echo "✅ Sample data inserted successfully"
+    else
+        echo "❌ Failed to insert sample data"
+        exit 1
+    fi
+fi
 
 # Install Go dependencies
 echo "📦 Installing Go dependencies..."
