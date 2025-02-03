@@ -68,6 +68,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		"user_id": user.ID,
 		"email":   user.Email,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+		"role":    user.Role,
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
@@ -77,6 +78,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	if err := json.NewEncoder(w).Encode(AuthResponse{Token: tokenString}); err != nil {
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 		return
@@ -124,6 +127,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(AuthResponse{Token: tokenString}); err != nil {
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 		return
@@ -147,6 +151,7 @@ func (h *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 
 	// Return user data as JSON
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"id":    user.ID,
 		"email": user.Email,
