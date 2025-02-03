@@ -23,12 +23,9 @@ func NewServer(cfg *config.Config, db *sql.DB) *Server {
 	return server
 }
 
-func (s *Server) setupRoutes() {
-	
-	handler := NewHandler(s.db)
-	
+func (s *Server) setupRoutes() {	
 	// Setup router
-	router := setupRouter(handler, s.db)
+	router := setupRouter( s.db)
 
 	// Apply CORS middleware
 	s.handler = middleware.NewCORS()(router)

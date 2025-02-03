@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func setupRouter(h *Handler, db *sql.DB) *mux.Router {
+func setupRouter( db *sql.DB) *mux.Router {
 	r := mux.NewRouter()
 
 	// Apply middlewares
