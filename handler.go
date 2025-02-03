@@ -1,3 +1,11 @@
+package main
+
+import (
+	"database/sql"
+	"encoding/json"
+	"net/http"
+)
+
 // GetUserProfile handles GET requests to fetch the user's profile
 func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	// You'll need to implement the logic to:
