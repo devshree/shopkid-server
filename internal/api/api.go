@@ -13,27 +13,32 @@ func setupRouter(h *Handler, db *sql.DB) *mux.Router {
 
 	// Apply middlewares
 	r.Use(middleware.RequestLogger)
+	r.Use(middleware.AuthMiddleware)
 	
 	// Auth routes
-	r.HandleFunc("/api/auth/login", h.Login).Methods("POST", "OPTIONS")
-	r.HandleFunc("/api/auth/register", h.Register).Methods("POST", "OPTIONS")
+	ah := handlers.NewAuthHandler(db)
+	r.HandleFunc("/api/auth/login", ah.Login).Methods("POST", "OPTIONS")
+	r.HandleFunc("/api/auth/register", ah.Register).Methods("POST", "OPTIONS")
 
 	// User profile routes
-	r.HandleFunc("/api/profile", h.GetUserProfile).Methods("GET", "OPTIONS")
-	r.HandleFunc("/api/profile", h.UpdateUserProfile).Methods("PUT", "OPTIONS")
+	uh := handlers.NewUserHandler(db)
+	r.HandleFunc("/api/profile", uh.GetUserProfile).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/profile", uh.UpdateUserProfile).Methods("PUT", "OPTIONS")
 
 	// Cart routes
-	r.HandleFunc("/api/cart", h.GetCart).Methods("GET", "OPTIONS")
-	r.HandleFunc("/api/cart", h.AddToCart).Methods("POST", "OPTIONS")
-	r.HandleFunc("/api/cart/{id}", h.UpdateCartItem).Methods("PUT", "OPTIONS")
-	r.HandleFunc("/api/cart/{id}", h.RemoveFromCart).Methods("DELETE", "OPTIONS")
+	ch := handlers.NewCartHandler(db)
+	r.HandleFunc("/api/cart", ch.GetCart).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/cart", ch.AddToCart).Methods("POST", "OPTIONS")
+	r.HandleFunc("/api/cart/{id}", ch.UpdateCartItem).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/api/cart/{id}", ch.RemoveFromCart).Methods("DELETE", "OPTIONS")
 
 	// Order routes
-	r.HandleFunc("/api/orders", h.GetOrders).Methods("GET", "OPTIONS")
-	r.HandleFunc("/api/orders", h.CreateOrder).Methods("POST", "OPTIONS")
-	r.HandleFunc("/api/orders/{id}", h.GetOrder).Methods("GET", "OPTIONS")
-	r.HandleFunc("/api/orders/{id}", h.UpdateOrder).Methods("PUT", "OPTIONS")
-	r.HandleFunc("/api/orders/{id}", h.DeleteOrder).Methods("DELETE", "OPTIONS")
+	oh := handlers.NewOrderHandler(db)
+	r.HandleFunc("/api/orders", oh.GetOrders).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/orders", oh.CreateOrder).Methods("POST", "OPTIONS")
+	r.HandleFunc("/api/orders/{id}", oh.GetOrder).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/orders/{id}", oh.UpdateOrder).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/api/orders/{id}", oh.DeleteOrder).Methods("DELETE", "OPTIONS")
 
 	// Product routes
 	productHandler := handlers.NewProductHandler(db)

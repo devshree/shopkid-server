@@ -58,10 +58,17 @@ type OrderItem struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }	
 
+type LoginHistory struct {
+	ID        int       `json:"id"`
+	UserId    string `json:"user"`
+	CreatedAt time.Time `json:"created_at"`
+	Status    string `json:"status"`
+}
+
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time `json:"created_at"`	
 }
 
 type RegisterRequest struct {

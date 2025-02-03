@@ -6,10 +6,12 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"kids-shop/internal/domain/models"
 	"kids-shop/internal/repository/postgres"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -118,7 +120,7 @@ func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 
 // Auth handlers
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
-	var req models.LoginRequest 
+	var req models.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -138,15 +140,26 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	// TODO: Generate JWT token here
-	// For now, just return the user without password
-	user.Password = ""
-	json.NewEncoder(w).Encode(user)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": user.ID,
+		"email": user.Email,
+		"role": user.Role,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	})	
+	tokenString, err := token.SignedString([]byte("secret"))
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
 }
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
@@ -218,8 +231,8 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 // Order handlers
 func (h *Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	// TODO: Get user_id from JWT token
-	userID := 1 // Temporary hardcoded value
-
+	userID := r.Context().Value("userID").(int)
+	
 	tx, err := h.db.Begin()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -239,7 +252,7 @@ func (h *Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	var orderItems []models.OrderItem
 	for rows.Next() {
 		var item models.OrderItem
-		err := rows.Scan(&item.ProductID, &item.Quantity, &item.Price)
+		err = rows.Scan(&item.ProductID, &item.Quantity, &item.Price)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
