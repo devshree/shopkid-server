@@ -15,7 +15,7 @@ INSERT INTO products (name, description, price, category, age_range, stock, imag
 INSERT INTO users (name, email, password, role) VALUES
     ('John Doe', 'john@example.com', 'hashed_password_1', 'buyer'),
     ('Jane Smith', 'jane@example.com', 'hashed_password_2', 'admin'),
-    ('Mike Johnson', 'mike@example.com', 'hashed_password_3', 'purchaser');
+    ('Mike Johnson', 'mike@example.com', 'hashed_password_3', 'buyer');
 
 -- Insert sample cart items
 INSERT INTO cart_items (user_id, product_id, quantity, price) VALUES

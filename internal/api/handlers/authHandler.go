@@ -100,7 +100,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		Email:    req.Email,
 		Password: string(hashedPassword),
 		Name:     req.Name,
-		Role:     req.Role,
+		Role:     models.UserRole(req.Role),
 	}
 	err = h.userRepo.CreateUser(user)
 	if err != nil {

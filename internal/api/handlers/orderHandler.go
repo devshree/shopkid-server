@@ -25,7 +25,7 @@ func NewOrderHandler(db *sql.DB) *OrderHandler {
 
 
 func (h *OrderHandler) GetOrders(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 
 	
 	var orders []models.Order
@@ -43,7 +43,7 @@ func (h *OrderHandler) GetOrders(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 
 	var order models.Order
 	if err := json.NewDecoder(r.Body).Decode(&order); err != nil {
@@ -61,7 +61,7 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	vars := mux.Vars(r)
 	orderID, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -87,7 +87,7 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 } 
 
 func (h *OrderHandler) UpdateOrder(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	vars := mux.Vars(r)
 	orderID, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -118,7 +118,7 @@ func (h *OrderHandler) UpdateOrder(w http.ResponseWriter, r *http.Request) {
 }		
 
 func (h *OrderHandler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	vars := mux.Vars(r)
 	orderID := vars["id"]
 
@@ -138,7 +138,7 @@ func (h *OrderHandler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OrderHandler) CreateOrderItem(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	vars := mux.Vars(r)
 	orderID, err := strconv.Atoi(vars["order_id"])
 	if err != nil {
@@ -171,7 +171,7 @@ func (h *OrderHandler) CreateOrderItem(w http.ResponseWriter, r *http.Request) {
 }	
 
 func (h *OrderHandler) GetOrderItems(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	vars := mux.Vars(r)
 	orderID, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -199,7 +199,7 @@ func (h *OrderHandler) GetOrderItems(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OrderHandler) DeleteOrderItem(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	vars := mux.Vars(r)
 	orderItemID, err := strconv.Atoi(vars["id"])
 	if err != nil {

@@ -17,7 +17,7 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(20) CHECK (role IN ('admin', 'buyer', 'purchaser')) NOT NULL DEFAULT 'buyer',
+    role VARCHAR(20) CHECK (role IN ('admin', 'buyer', 'other')) NOT NULL DEFAULT 'buyer',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

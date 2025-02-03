@@ -24,7 +24,8 @@ func NewCartHandler(db *sql.DB) *CartHandler {
 }	
 
 func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
+	
 	cart, err := h.cartRepo.GetCart(userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -38,7 +39,7 @@ func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CartHandler) AddToCart(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	var item models.CartItem
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -56,7 +57,7 @@ func (h *CartHandler) AddToCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CartHandler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	var item models.CartItem
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -74,7 +75,7 @@ func (h *CartHandler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	if err := h.cartRepo.ClearCart(userID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -83,7 +84,7 @@ func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CartHandler) UpdateCartItem(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 	var item models.CartItem
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
