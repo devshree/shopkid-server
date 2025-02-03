@@ -4,9 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"kids-shop/internal/domain/models"
 	"kids-shop/internal/repository/postgres"
+
+	"github.com/gorilla/mux"
 )
 
 type CartHandler struct {
@@ -58,20 +61,16 @@ func (h *CartHandler) AddToCart(w http.ResponseWriter, r *http.Request) {
 
 func (h *CartHandler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(models.UserIDKey).(int)
-	var item models.CartItem
-	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
+	cartItemID, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := h.cartRepo.RemoveFromCart(userID, item.ProductID); err != nil {
+	if err := h.cartRepo.RemoveFromCart(userID, cartItemID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}		
-	err := json.NewEncoder(w).Encode(item)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +89,7 @@ func (h *CartHandler) UpdateCartItem(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := h.cartRepo.UpdateCartItem(userID, item.ProductID, item.Quantity, item.Price); err != nil {
+	if err := h.cartRepo.UpdateCartItem(userID, item.ID, item.Quantity); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

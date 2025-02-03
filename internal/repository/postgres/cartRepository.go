@@ -48,17 +48,15 @@ func (r *CartRepository) AddToCart(userID int, productID int, quantity int, pric
 	return nil
 }
 
-func (r *CartRepository) RemoveFromCart(userID int, productID int) error {
+func (r *CartRepository) RemoveFromCart(userID int, cartItemID int) error {
 	_, err := r.db.Exec(`
-		DELETE FROM cart_items WHERE user_id = $1 AND product_id = $2
-	`, userID, productID)
+		DELETE FROM cart_items WHERE user_id = $1 AND id = $2
+	`, userID, cartItemID)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
-
 
 func (r *CartRepository) ClearCart(userID int) error {
 	_, err := r.db.Exec(`
@@ -67,10 +65,10 @@ func (r *CartRepository) ClearCart(userID int) error {
 	return err
 }
 
-func (r *CartRepository) UpdateCartItem(userID int, productID int, quantity int, price float64) error {
+func (r *CartRepository) UpdateCartItem(userID int, cartItemID int, quantity int) error {
 	_, err := r.db.Exec(`
-		UPDATE cart_items SET quantity = $1, price = $2 WHERE user_id = $3 AND product_id = $4
-	`, quantity, price, userID, productID)
+		UPDATE cart_items SET quantity = $1 WHERE user_id = $2 AND id = $3
+	`, quantity, userID, cartItemID)
 	return err
 }
 
