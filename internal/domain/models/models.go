@@ -45,6 +45,7 @@ type Order struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Items     []OrderItem `json:"items"`
 	Status    string `json:"status"`
+	OrderItems []OrderItem `json:"order_items"`
 }
 
 
@@ -58,11 +59,18 @@ type OrderItem struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }	
 
+type LoginStatus string
+
+const (
+	Success LoginStatus = "success"
+	Error   LoginStatus = "error"
+)
+
 type LoginHistory struct {
 	ID        int       `json:"id"`
-	UserId    string `json:"user"`
+	UserId    string `json:"user_id"` 
 	CreatedAt time.Time `json:"created_at"`
-	Status    string `json:"status"`
+	Status    LoginStatus `json:"status"`
 }
 
 type LoginRequest struct {

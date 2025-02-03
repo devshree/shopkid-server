@@ -65,7 +65,13 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
-var product models.Product
+	userRole := r.Context().Value(models.UserRoleKey).(string)
+	if userRole != "admin" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var product models.Product
 	if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
 		log.Println("Error decoding product:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)

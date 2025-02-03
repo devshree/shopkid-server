@@ -30,7 +30,11 @@ func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(cart)
+	err = json.NewEncoder(w).Encode(cart)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *CartHandler) AddToCart(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +48,11 @@ func (h *CartHandler) AddToCart(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(item)
+	err := json.NewEncoder(w).Encode(item)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *CartHandler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +66,11 @@ func (h *CartHandler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}		
-	json.NewEncoder(w).Encode(item)
+	err := json.NewEncoder(w).Encode(item)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
@@ -81,5 +93,9 @@ func (h *CartHandler) UpdateCartItem(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(item)
+	err := json.NewEncoder(w).Encode(item)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

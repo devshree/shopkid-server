@@ -38,8 +38,8 @@ func (r *OrderRepository) GetOrdersByUserID(userID int) ([]models.Order, error) 
 	return orders, nil
 }
 
-func (r *OrderRepository) GetOrderById(id int) (*models.Order, error) {
-	row := r.db.QueryRow("SELECT id, user_id, total_amount, status, created_at, updated_at FROM orders WHERE id = $1", id)
+func (r *OrderRepository) GetOrderById(id int,  user_id int) (*models.Order, error) {
+	row := r.db.QueryRow("SELECT id, user_id, total_amount, status, created_at, updated_at FROM orders WHERE id = $1 AND user_id = $2", id, user_id)
 
 	var order models.Order
 	err := row.Scan(&order.ID, &order.UserID, &order.TotalAmount, &order.Status, &order.CreatedAt, &order.UpdatedAt)
@@ -82,6 +82,17 @@ func (r *OrderRepository) GetOrderItemsByOrderID(orderID int) ([]models.OrderIte
 	}
 	return orderItems, nil
 }
+
+func (r *OrderRepository) GetOrderItemById(id int) (*models.OrderItem, error) {
+	row := r.db.QueryRow("SELECT id, order_id, product_id, quantity, price, created_at, updated_at FROM order_items WHERE id = $1", id)
+
+	var orderItem models.OrderItem
+	err := row.Scan(&orderItem.ID, &orderItem.OrderID, &orderItem.ProductID, &orderItem.Quantity, &orderItem.Price, &orderItem.CreatedAt, &orderItem.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &orderItem, nil
+}	
 
 
 func (r *OrderRepository) DeleteOrderItem(id int) error {

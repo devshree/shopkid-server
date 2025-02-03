@@ -3,27 +3,27 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"kids-shop/internal/domain/models"
+	"kids-shop/internal/repository/postgres"
 	"net/http"
 )
 
 type UserHandler struct {
-	db *sql.DB
-}
-
-type UserProfile struct {
-	ID    int    `json:"id"`
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	db *sql.DB	
+	userRepo *postgres.UserRepository
 }
 
 func NewUserHandler(db *sql.DB) *UserHandler {
-	return &UserHandler{db: db}
+		return &UserHandler{
+		db: db,
+		userRepo: postgres.NewUserRepository(db),
+	}
 }
 
 func (h *UserHandler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 
-	var profile UserProfile
+	var profile models.User
 	err := h.db.QueryRow("SELECT id, email, name FROM users WHERE id = $1", userID).
 		Scan(&profile.ID, &profile.Email, &profile.Name)
 	if err != nil {
@@ -31,20 +31,27 @@ func (h *UserHandler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(profile)
+	err = json.NewEncoder(w).Encode(profile)
+	if err != nil {
+		http.Error(w, "Error encoding profile", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *UserHandler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(int)
+	userID := r.Context().Value(models.UserIDKey).(int)
 
-	var profile UserProfile
+	var profile models.User
 	if err := json.NewDecoder(r.Body).Decode(&profile); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+	if profile.ID != userID {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
-	_, err := h.db.Exec("UPDATE users SET name = $1 WHERE id = $2",
-		profile.Name, userID)
+	err := h.userRepo.UpdateUser(&profile)
 	if err != nil {
 		http.Error(w, "Error updating profile", http.StatusInternalServerError)
 		return

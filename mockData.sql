@@ -11,26 +11,32 @@ INSERT INTO products (name, description, price, category, age_range, stock, imag
     ('Magnetic Tiles', 'Magnetic building tiles set', 34.99, 'toys', '3-10', 55, 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=500'),
     ('Sports Shoes', 'Comfortable athletic shoes', 29.99, 'clothes', '7-12', 90, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500');
 
--- Insert sample users
-INSERT INTO users (name, email, password) VALUES
-    ('John Doe', 'john@example.com', 'hashed_password_1'),
-    ('Jane Smith', 'jane@example.com', 'hashed_password_2'),
-    ('Mike Johnson', 'mike@example.com', 'hashed_password_3'),
-    ('Sarah Wilson', 'sarah@example.com', 'hashed_password_4'),
-    ('Tom Brown', 'tom@example.com', 'hashed_password_5');
+-- Insert sample users with roles
+INSERT INTO users (name, email, password, role) VALUES
+    ('John Doe', 'john@example.com', 'hashed_password_1', 'buyer'),
+    ('Jane Smith', 'jane@example.com', 'hashed_password_2', 'admin'),
+    ('Mike Johnson', 'mike@example.com', 'hashed_password_3', 'purchaser');
 
 -- Insert sample cart items
-INSERT INTO cart_items (product_id, quantity, price) VALUES
-    (1, 2, 59.98),
-    (3, 1, 15.99),
-    (5, 1, 39.99),
-    (7, 3, 68.97),
-    (9, 2, 69.98);
+INSERT INTO cart_items (user_id, product_id, quantity, price) VALUES
+    (1, 1, 2, 59.98),
+    (2, 2, 1, 45.99),
+    (3, 3, 3, 47.97);
 
 -- Insert sample orders
-INSERT INTO orders (user_id, product_id, quantity, price) VALUES
-    (1, 2, 1, 45.99),
-    (2, 4, 2, 49.98),
-    (3, 6, 1, 19.99),
-    (4, 8, 1, 49.99),
-    (5, 10, 2, 59.98);
+INSERT INTO orders (user_id, total_amount, status) VALUES
+    (1, 59.98, 'pending'),
+    (2, 45.99, 'completed'),
+    (3, 47.97, 'pending');
+
+-- Insert sample order items
+INSERT INTO order_items (order_id, product_id, quantity, price) VALUES
+    (1, 1, 2, 29.99),
+    (2, 2, 1, 45.99),
+    (3, 3, 3, 15.99);
+
+-- Insert sample login history
+INSERT INTO login_history (user_id, status) VALUES
+    ('1', 'success'),
+    ('2', 'error'),
+    ('1', 'success');

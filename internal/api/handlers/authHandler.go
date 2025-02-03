@@ -3,9 +3,12 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"kids-shop/internal/domain/models"
+	"kids-shop/internal/repository/postgres"
 	"net/http"
-	"time"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
@@ -13,17 +16,8 @@ import (
 
 type AuthHandler struct {
 	db *sql.DB
-}
-
-type LoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type RegisterRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Name     string `json:"name"`
+	userRepo *postgres.UserRepository
+	authRepo *postgres.AuthRepository
 }
 
 type AuthResponse struct {
@@ -31,31 +25,39 @@ type AuthResponse struct {
 }
 
 func NewAuthHandler(db *sql.DB) *AuthHandler {
-	return &AuthHandler{db: db}
+	return &AuthHandler{
+		db: db,
+		userRepo: postgres.NewUserRepository(db),
+		authRepo: postgres.NewAuthRepository(db),
+	}
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	var req LoginRequest
+	var req models.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	// Query user from database
-	var user struct {
-		ID       int
-		Email    string
-		Password string
-	}
-	err := h.db.QueryRow("SELECT id, email, password FROM users WHERE email = $1", req.Email).Scan(&user.ID, &user.Email, &user.Password)
+	user, err := h.userRepo.GetUserByEmail(req.Email)
 	if err != nil {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
+
 	// Verify password
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
+	err = h.authRepo.CreateLogin(&models.LoginHistory{
+		UserId: strconv.Itoa(user.ID),
+		Status: models.Success,
+	})
+	if err != nil {
+		http.Error(w, "Error creating login history", http.StatusInternalServerError)
 		return
 	}
 
@@ -72,11 +74,15 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(AuthResponse{Token: tokenString})
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(AuthResponse{Token: tokenString}); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
-	var req RegisterRequest
+	var req models.RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
@@ -90,11 +96,13 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Insert user into database
-	var userID int
-	err = h.db.QueryRow(
-		"INSERT INTO users (email, password, name) VALUES ($1, $2, $3) RETURNING id",
-		req.Email, string(hashedPassword), req.Name,
-	).Scan(&userID)
+	user := &models.User{
+		Email:    req.Email,
+		Password: string(hashedPassword),
+		Name:     req.Name,
+		Role:     req.Role,
+	}
+	err = h.userRepo.CreateUser(user)
 	if err != nil {
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
@@ -102,8 +110,8 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	// Generate JWT token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"email":   req.Email,
+		"user_id": user.ID,
+		"email":   user.Email,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
 
@@ -113,5 +121,9 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(AuthResponse{Token: tokenString})
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(AuthResponse{Token: tokenString}); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 } 

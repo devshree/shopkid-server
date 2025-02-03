@@ -105,3 +105,11 @@ CREATE TRIGGER delete_product_cart_items
     FOR EACH ROW
     EXECUTE FUNCTION delete_related_cart_items();
 
+-- Create login_history table
+CREATE TABLE login_history (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    status VARCHAR(20) CHECK (status IN ('success', 'error')) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+

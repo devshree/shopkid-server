@@ -26,10 +26,10 @@ func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 }
 
 func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
-	row := r.db.QueryRow("SELECT id, name, email, password FROM users WHERE email = $1", email)
+	row := r.db.QueryRow("SELECT id, name, email, password, role FROM users WHERE email = $1", email)
 	
 	var user models.User
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +45,15 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 func (r *UserRepository) UpdateUser(user *models.User) error {
 	_, err := r.db.Exec("UPDATE users SET name = $1, email = $2, password = $3, role = $4 WHERE id = $5", user.Name, user.Email, user.Password, user.Role, user.ID)
 	return err
+}
+
+func (r *UserRepository) GetUserRole(userID int) (string, error) {
+	var role string
+	err := r.db.QueryRow("SELECT role FROM users WHERE id = $1", userID).Scan(&role)
+	if err != nil {
+		return "", err
+	}
+	return role, nil
 }
 
 

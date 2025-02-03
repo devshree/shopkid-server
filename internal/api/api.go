@@ -13,7 +13,7 @@ func setupRouter( db *sql.DB) *mux.Router {
 
 	// Apply middlewares
 	r.Use(middleware.RequestLogger)
-	r.Use(middleware.AuthMiddleware)
+	r.Use(middleware.AuthMiddleware(db))
 	
 	// Auth routes
 	ah := handlers.NewAuthHandler(db)
