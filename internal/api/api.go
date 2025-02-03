@@ -19,6 +19,7 @@ func setupRouter( db *sql.DB) *mux.Router {
 	ah := handlers.NewAuthHandler(db)
 	r.HandleFunc("/api/auth/login", ah.Login).Methods("POST", "OPTIONS")
 	r.HandleFunc("/api/auth/register", ah.Register).Methods("POST", "OPTIONS")
+	r.HandleFunc("/api/user/me", ah.GetCurrentUser).Methods("GET", "OPTIONS")
 
 	// User profile routes
 	uh := handlers.NewUserHandler(db)

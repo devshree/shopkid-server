@@ -15,7 +15,7 @@ func NewAuthRepository(db *sql.DB) *AuthRepository {
 }
 
 func (r *AuthRepository) CreateLogin(login *models.LoginHistory) error {
-	_, err := r.db.Exec("INSERT INTO logins (user_id, status) VALUES ($1, $2)", login.UserId, login.Status)
+	_, err := r.db.Exec("INSERT INTO login_history (user_id, status) VALUES ($1, $2)", login.UserId, login.Status)
 	return err
 }
 
@@ -36,6 +36,15 @@ func (r *AuthRepository) GetLoginsByUserID(userID int) ([]models.LoginHistory, e
 		logins = append(logins, login)
 	}
 	return logins, nil
+}
+
+func (r *AuthRepository) GetUserByID(id int) (*models.User, error) {
+	user := &models.User{}
+	err := r.db.QueryRow("SELECT id, email, name FROM users WHERE id = $1", id).Scan(&user.ID, &user.Email, &user.Name)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 

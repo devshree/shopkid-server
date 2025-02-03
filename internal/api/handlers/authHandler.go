@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"kids-shop/internal/domain/models"
 	"kids-shop/internal/repository/postgres"
 	"net/http"
@@ -57,6 +58,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Status: models.Success,
 	})
 	if err != nil {
+		fmt.Println("Error creating login history", err)
 		http.Error(w, "Error creating login history", http.StatusInternalServerError)
 		return
 	}
@@ -126,4 +128,28 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (h *AuthHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	// Get user ID from context (set by auth middleware)
+	userID, ok := r.Context().Value("userID").(int)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Get user from database
+	user, err := h.userRepo.GetUserByID(userID)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	// Return user data as JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"id":    user.ID,
+		"email": user.Email,
+		"name":  user.Name,
+	})
 } 
