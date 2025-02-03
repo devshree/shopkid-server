@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"kids-shop/config"
 	"kids-shop/middleware"
+	"log"
 	"net/http"
 )
 
@@ -34,5 +35,6 @@ func (s *Server) setupRoutes() {
 }
 
 func (s *Server) Start() error {
+	log.Printf("Starting server on port %s", s.config.Server.Port)
 	return http.ListenAndServe(":"+s.config.Server.Port, s.handler)
 } 
