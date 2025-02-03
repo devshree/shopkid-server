@@ -5,6 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"kids-shop/postgres"
+	"kids-shop/service"
+
 	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 )
@@ -19,12 +22,20 @@ func main() {
 	db := initDB()
 	log.Printf("Database connected")
 
-	h := NewHandler(db)
+	// Initialize repositories
+	productRepo := postgres.NewProductRepository(db)
 	
-	r := setupRouter(h)
+	// Initialize services
+	productService := service.NewProductService(productRepo)
+	
+	// Initialize handler with services
+	handler := NewHandler(db, productService)
+	
+	// Setup router
+	router := setupRouter(handler)
 
 	// Apply CORS middleware
-	handler := middleware.NewCORS()(r)
+	handler = middleware.NewCORS()(router)
 
 	log.Printf("Router initialized")
 

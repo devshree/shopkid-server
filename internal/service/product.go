@@ -40,5 +40,3 @@ func (s *productService) Update(product *models.Product) error {
 func (s *productService) Delete(id int) error {
 	return s.repo.Delete(id)
 }
-
-// ... implement other methods 

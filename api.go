@@ -1,12 +1,13 @@
 package main
 
 import (
+	"kids-shop/handlers"
 	"kids-shop/middleware"
 
 	"github.com/gorilla/mux"
 )
 
-func setupRouter(h *Handler) (*mux.Router) {
+func setupRouter(h *Handler) *mux.Router {
 	r := mux.NewRouter()
 
 	// Apply middlewares
@@ -33,12 +34,13 @@ func setupRouter(h *Handler) (*mux.Router) {
 	r.HandleFunc("/api/orders/{id}", h.UpdateOrder).Methods("PUT", "OPTIONS")
 	r.HandleFunc("/api/orders/{id}", h.DeleteOrder).Methods("DELETE", "OPTIONS")
 
-	// Product routes (existing)
-	r.HandleFunc("/api/products", h.GetProducts).Methods("GET", "OPTIONS")
-	r.HandleFunc("/api/products/{id}", h.GetProduct).Methods("GET", "OPTIONS")
-	r.HandleFunc("/api/products", h.CreateProduct).Methods("POST", "OPTIONS")
-	r.HandleFunc("/api/products/{id}", h.UpdateProduct).Methods("PUT", "OPTIONS")
-	r.HandleFunc("/api/products/{id}", h.DeleteProduct).Methods("DELETE", "OPTIONS")
+	// Product routes
+	productHandler := handlers.NewProductHandler(h.productService)
+	r.HandleFunc("/api/products", productHandler.GetProducts).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/products/{id}", productHandler.GetProduct).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/products", productHandler.CreateProduct).Methods("POST", "OPTIONS")
+	r.HandleFunc("/api/products/{id}", productHandler.UpdateProduct).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/api/products/{id}", productHandler.DeleteProduct).Methods("DELETE", "OPTIONS")
 
 	return r
 } 
