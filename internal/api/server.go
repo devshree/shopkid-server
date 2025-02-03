@@ -1,40 +1,38 @@
 package api
 
 import (
+	"database/sql"
 	"kids-shop/config"
-	"kids-shop/internal/api/handlers"
-	"kids-shop/internal/service"
+	"kids-shop/middleware"
 	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 type Server struct {
 	config   *config.Config
-	router   *mux.Router
-	services *service.Services
+	handler   http.Handler 
+	db       *sql.DB
 }
 
-func NewServer(cfg *config.Config, services *service.Services) *Server {
+func NewServer(cfg *config.Config, db *sql.DB) *Server {
 	server := &Server{
 		config:   cfg,
-		router:   mux.NewRouter(),
-		services: services,
+		db:       db,
 	}
 	server.setupRoutes()
 	return server
 }
 
 func (s *Server) setupRoutes() {
-	productHandler := handlers.NewProductHandler(s.services.Product)
-
-	api := s.router.PathPrefix("/api").Subrouter()
 	
-	// Product routes
-	api.HandleFunc("/products", productHandler.GetProducts).Methods("GET")
-	// Add other routes...
+	handler := NewHandler(s.db)
+	
+	// Setup router
+	router := setupRouter(handler, s.db)
+
+	// Apply CORS middleware
+	s.handler = middleware.NewCORS()(router)
 }
 
 func (s *Server) Start() error {
-	return http.ListenAndServe(":"+s.config.Server.Port, s.router)
+	return http.ListenAndServe(":"+s.config.Server.Port, s.handler)
 } 

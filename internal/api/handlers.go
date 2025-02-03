@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"database/sql"
@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"kids-shop/service"
+	"kids-shop/internal/domain/models"
+	"kids-shop/internal/repository/postgres"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
@@ -15,95 +16,22 @@ import (
 
 type Handler struct {
 	db *sql.DB
-	productService *service.ProductService
+	productRepo *postgres.ProductRepository
 }
 
-func NewHandler(db *sql.DB, productService *service.ProductService) *Handler {
+func NewHandler(db *sql.DB) *Handler {
+
+	productRepo := postgres.NewProductRepository(db)
+	
 	return &Handler{
 		db: db,
-		productService: productService,
+		productRepo: productRepo,
 	}
 }
 
-func (h *Handler) GetProducts(w http.ResponseWriter, r *http.Request) {
-	var products []Product
-	rows, err := h.db.Query("SELECT id, name, description, price, category, age_range, stock, image, created_at FROM products")
-	if err != nil {
-		log.Println("Error querying products:", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var p Product
-		err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Category, &p.Age_Range, &p.Stock, &p.Image, &p.CreatedAt)
-		if err != nil {
-			log.Println("Error scanning product:", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		products = append(products, p)
-	}
-
-	if err := json.NewEncoder(w).Encode(products); err != nil {
-		log.Println("Error encoding response:", err)
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
-		return
-	}
-}
-
-func (h *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		log.Println("Error converting product ID:", err)
-		http.Error(w, "Invalid product ID", http.StatusBadRequest)
-		return
-	}
-
-	var p Product
-	err = h.db.QueryRow("SELECT id, name, description, price, category, age_range, stock, image, created_at FROM products WHERE id = $1", id).
-		Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Category, &p.Age_Range, &p.Stock, &p.Image, &p.CreatedAt)
-	if err != nil {
-		log.Println("Error querying product:", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := json.NewEncoder(w).Encode(p); err != nil {
-		log.Println("Error encoding response:", err)
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
-		return
-	}
-}
-
-func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
-	var p Product
-	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
-		log.Println("Error decoding product:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	err := h.db.QueryRow(
-		"INSERT INTO products (name, description, price, category, age_range, stock, image) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
-		p.Name, p.Description, p.Price, p.Category, p.Age_Range, p.Stock, p.Image).Scan(&p.ID)
-	if err != nil {
-		log.Println("Error creating product:", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := json.NewEncoder(w).Encode(p); err != nil {
-		log.Println("Error encoding response:", err)
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
-		return
-	}
-}
 
 func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
-	var item CartItem
+	var item models.CartItem
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		log.Println("Error decoding cart item:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -145,32 +73,6 @@ func (h *Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(w, "Invalid product ID", http.StatusBadRequest)
-		return
-	}
-
-	var p Product
-	if err = json.NewDecoder(r.Body).Decode(&p); err != nil {
-		log.Println("Error decoding product:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	log.Println("Updating product:", p)
-
-	_, err = h.db.Exec(
-		"UPDATE products SET name=$1, description=$2, price=$3, category=$4, age_range=$5, stock=$6, image=$7, updated_at=CURRENT_TIMESTAMP WHERE id=$8",
-		p.Name, p.Description, p.Price, p.Category, p.Age_Range, p.Stock, p.Image, id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-}
 
 func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -216,13 +118,13 @@ func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 
 // Auth handlers
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
-	var req LoginRequest
+	var req models.LoginRequest 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	var user User
+	var user models.User
 	err := h.db.QueryRow(
 		"SELECT id, email, password, role FROM users WHERE email = $1",
 		req.Email,
@@ -248,7 +150,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
-	var user User
+	var user models.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -294,10 +196,10 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	var items []CartItem
+	var items []models.CartItem
 	for rows.Next() {
-		var item CartItem
-		item.Product = &Product{}
+		var item models.CartItem
+		item.Product = &models.Product{}
 		err := rows.Scan(
 			&item.ID, &item.UserID, &item.ProductID, &item.Quantity, &item.Price, &item.CreatedAt,
 			&item.Product.Name, &item.Product.Description, &item.Product.Image,
@@ -334,9 +236,9 @@ func (h *Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	var totalAmount float64
-	var orderItems []OrderItem
+	var orderItems []models.OrderItem
 	for rows.Next() {
-		var item OrderItem
+		var item models.OrderItem
 		err := rows.Scan(&item.ProductID, &item.Quantity, &item.Price)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -347,7 +249,7 @@ func (h *Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create order
-	var order Order
+	var order models.Order
 	err = tx.QueryRow(
 		"INSERT INTO orders (user_id, total_amount) VALUES ($1, $2) RETURNING id, created_at",
 		userID, totalAmount,
@@ -384,10 +286,41 @@ func (h *Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	order.Items = orderItems
 	json.NewEncoder(w).Encode(order)
 }
+func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
+	// TODO: Get user_id from JWT token
+	// userID := 1 // Temporary hardcoded value
+
+	// TODO: Implement order retrieval logic
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) GetOrder(w http.ResponseWriter, r *http.Request) {
+	// TODO: Get user_id from JWT token
+	// userID := 1 // Temporary hardcoded value
+
+	// TODO: Implement order retrieval logic
+	w.WriteHeader(http.StatusOK)
+}	
+
+func (h *Handler) UpdateOrder(w http.ResponseWriter, r *http.Request) {
+	// TODO: Get user_id from JWT token
+	// userID := 1 // Temporary hardcoded value
+
+	// TODO: Implement order update logic
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
+	// TODO: Get user_id from JWT token
+	// userID := 1 // Temporary hardcoded value
+
+	// TODO: Implement order deletion logic	
+	w.WriteHeader(http.StatusOK)
+}
 
 func (h *Handler) UpdateCartItem(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
+	// vars := mux.Vars(r)
+	// id := vars["id"]
 	
 	// TODO: Implement cart item update logic
 	w.WriteHeader(http.StatusOK)

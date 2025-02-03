@@ -4,7 +4,6 @@ import (
 	"kids-shop/config"
 	"kids-shop/internal/api"
 	"kids-shop/internal/repository/postgres"
-	"kids-shop/internal/service"
 	"log"
 )
 
@@ -22,13 +21,7 @@ func main() {
 	}
 	defer db.Close()
 
-	// Initialize repositories
-	repos := postgres.NewRepositories(db)
-
-	// Initialize services
-	services := service.NewServices(repos)
-
 	// Initialize and start HTTP server
-	server := api.NewServer(cfg, services)
+	server := api.NewServer(cfg, db)
 	log.Fatal(server.Start())
 } 

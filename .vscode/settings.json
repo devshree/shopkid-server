@@ -21,7 +21,7 @@
   },
   "go.useLanguageServer": true,
   "go.lintTool": "golangci-lint",
-  "go.formatTool": "gofmt",
+  "go.formatTool": "goimports",
   "[go]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
@@ -38,7 +38,8 @@
       "shadow": true
     },
     "ui.semanticTokens": true,
-    "formatting.gofumpt": true
+    "formatting.gofumpt": true,
+    "formatting.local": "github.com/devshree"
   },
   "go.toolsManagement.autoUpdate": true,
   "go.vetOnSave": "workspace",

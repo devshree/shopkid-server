@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"strings"
 
@@ -34,7 +35,8 @@ type Config struct {
 
 func Load() (*Config, error) {
 	if err := godotenv.Load(); err != nil {
-		// Continue even if .env file is not found
+		log.Println("No .env file found, using system env")
+		
 	}
 
 	return &Config{

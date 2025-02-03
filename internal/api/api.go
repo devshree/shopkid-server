@@ -1,13 +1,14 @@
-package main
+package api
 
 import (
-	"kids-shop/handlers"
+	"database/sql"
+	"kids-shop/internal/api/handlers"
 	"kids-shop/middleware"
 
 	"github.com/gorilla/mux"
 )
 
-func setupRouter(h *Handler) *mux.Router {
+func setupRouter(h *Handler, db *sql.DB) *mux.Router {
 	r := mux.NewRouter()
 
 	// Apply middlewares
@@ -35,7 +36,7 @@ func setupRouter(h *Handler) *mux.Router {
 	r.HandleFunc("/api/orders/{id}", h.DeleteOrder).Methods("DELETE", "OPTIONS")
 
 	// Product routes
-	productHandler := handlers.NewProductHandler(h.productService)
+	productHandler := handlers.NewProductHandler(db)
 	r.HandleFunc("/api/products", productHandler.GetProducts).Methods("GET", "OPTIONS")
 	r.HandleFunc("/api/products/{id}", productHandler.GetProduct).Methods("GET", "OPTIONS")
 	r.HandleFunc("/api/products", productHandler.CreateProduct).Methods("POST", "OPTIONS")
